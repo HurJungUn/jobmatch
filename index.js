@@ -29,112 +29,135 @@ app.set('view engine', 'ejs');
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json()); //미들웨어로 바디파서를 사용함.
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get('/', function(req, res) {
-    res.render('main', {msg:'Welcome To Express4'});
+app.get('/', function (req, res) {
+    res.render('main', { msg: 'Welcome To Express4' });
 });
 
-app.get('/top20', function(req, res){
+app.get('/top20', function (req, res) {
 
-    request("https://www.naver.com", function(err, response, body){
-    let list = [];
-    $ = cheerio.load(body);
-    
-    let top20 = $(".ah_roll_area > .ah_l > li > a > .ah_k");
+    request("https://www.naver.com", function (err, response, body) {
+        let list = [];
+        $ = cheerio.load(body);
 
-    for (let i = 0; i < top20.length; i++) {
-        let msg = $(top20[i]).text();
-        list.push(msg);
-    }
+        let top20 = $(".ah_roll_area > .ah_l > li > a > .ah_k");
 
-    res.render('top',{
-        msg:'네이버 실시간 급상승 검색어',
-        list:list
-    });
-    });
-});
+        for (let i = 0; i < top20.length; i++) {
+            let msg = $(top20[i]).text();
+            list.push(msg);
+        }
 
-app.get('/ganyum', function(req, res){
-
-    request("https://gall.dcinside.com/board/lists?id=comic_new1&exception_mode=recommend", function(err, response, body){
-    let list = [];
-    $ = cheerio.load(body);
-    
-    let top20 = $(".ub-content");
-
-    for (let i = 0; i < top20.length; i++) {
-        let msg = $(top20[i]).text();
-        list.push(msg);
-    }
-
-    res.render('dc',{
-        msg:'만갤념글 목록',
-        list:list
-    });
+        res.render('top', {
+            msg: '네이버 실시간 급상승 검색어',
+            list: list
+        });
     });
 });
 
-app.post('/ganyum', function(req, res){
+app.get('/ganyum', function (req, res) {
+
+    request("https://gall.dcinside.com/board/lists?id=comic_new1&exception_mode=recommend", function (err, response, body) {
+        let list = [];
+        $ = cheerio.load(body);
+
+        let top20 = $(".ub-content");
+
+        for (let i = 0; i < top20.length; i++) {
+            let msg = $(top20[i]).text();
+            list.push(msg);
+        }
+
+        res.render('dc', {
+            msg: '만갤념글 목록',
+            list: list
+        });
+    });
+});
+app.post('/recom', function (req,res) {
+        let sql = "INSERT INTO count (id,title,writer,recommend) VALUES(?,?,?,?)";
+        request("https://gall.dcinside.com/board/lists?id=comic_new1&exception_mode=recommend", function (err, response, body) {
+            let list = [];
+            $ = cheerio.load(body);
+            let recommendcnt = $(".ub-content > .gall_recommend");
+
+            for (let i = 0; i < recommendcnt.length; i++) {
+                let msg = $(recommendcnt[i]).text();
+                list.push(msg);
+            }
+
+            for (let i = 0; i < list.length; i++) {
+                let com = list[i];
+                conn.query(sql, ["11","asdf","asdf","com"], function(err, result){
+
+                });
+            }
+
+            res.render('main', {
+                msg: 'Welcome To Express4'
+            });
+        });
+});
+app.post('/ganyum', function (req, res) {
 
     let word = req.body.word;
     word = qs.escape(word);
     let url = "https://gall.dcinside.com/board/lists?id=" + word + "&exception_mode=recommend";
-    request(url, function(err, response, body){
-    let list = [];
-    $ = cheerio.load(body);
-    
-    let top20 = $(".ub-content");
+    request(url, function (err, response, body) {
+        let list = [];
+        $ = cheerio.load(body);
 
-    for (let i = 0; i < top20.length; i++) {
-        let msg = $(top20[i]).text();
-        list.push(msg);
-    }
+        let top20 = $(".ub-content");
 
-    res.render('dc',{
-        msg:'념글 목록',
-        list:list
-    });
+        for (let i = 0; i < top20.length; i++) {
+            let msg = $(top20[i]).text();
+            list.push(msg);
+        }
+
+        res.render('dc', {
+            msg: '념글 목록',
+            list: list
+        });
     });
 });
 
-app.get('/search', function(req, res){
+app.get('/search', function (req, res) {
 
-    res.render('search',{list:list = undefined});
+    res.render('search', { list: list = undefined });
 
 });
 
-app.post('/search', function(req, res){
+app.post('/search', function (req, res) {
 
     let word = req.body.word;
-    let url = "https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query="+word;
-    request(url, function(err, response, body){
-    let list = [];
-    $ = cheerio.load(body);
-    
-    let result = $(".sp_website .type01 > li dt > a:first-child");
+    let url = "https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=" + word;
+    request(url, function (err, response, body) {
+        let list = [];
+        $ = cheerio.load(body);
 
-    for (let i = 0; i < result.length; i++) {
-        let msg = $(result[i]).text();
-        list.push(msg);
-    }
+        let result = $(".sp_website .type01 > li dt > a:first-child");
 
-    res.render('search',{
-        msg:'검색 결과',
-        list:list
-    });
+        for (let i = 0; i < result.length; i++) {
+            let msg = $(result[i]).text();
+            list.push(msg);
+        }
+
+        res.render('search', {
+            msg: '검색 결과',
+            list: list
+        });
     });
 
 });
 
-app.get('/lunch', function(req, res){
+app.get('/lunch', function (req, res) {
 
-    res.render('lunch',{
+    res.render('lunch', {
 
     });
 });
 
-app.post('/lunch', function(req, res){
+app.post('/lunch', function (req, res) {
 
     let date = req.body.date;
     date = date.split("-").join("");
@@ -144,53 +167,53 @@ app.post('/lunch', function(req, res){
         headers: {
             'User-Agent': 'Mozilla/5.0'
         },
-        encoding:null
+        encoding: null
     }
-    
-    request(options , function(err, response, body){
-        if(err != null){
+
+    request(options, function (err, response, body) {
+        if (err != null) {
             return;
         }
-    
+
         const enc = charset(response.headers, body);
         const result = iconv.decode(body, enc);
-    
+
         $ = cheerio.load(result);
         let menu = $(".menuName > span");
 
         res.render('lunch', {
-            menu : menu.text()
+            menu: menu.text()
         });
     });
 
 });
 
-app.get('/board', function(req, res){
+app.get('/board', function (req, res) {
 
     let sql = "SELECT * FROM board WHERE title LIKE ? ORDER BY id DESC";
 
     let keyword = "%%";
-    if(req.query.key != undefined){
+    if (req.query.key != undefined) {
         keyword = "%" + req.query.key + "%";
     }
-    conn.query(sql, [keyword], function(err, result){
+    conn.query(sql, [keyword], function (err, result) {
 
         res.render('board', {
-            list:result
+            list: result
         });
     });
 
 });
 
-app.get('/board/write', function(req, res){
+app.get('/board/write', function (req, res) {
 
-        res.render('write', {
-            
-        });
+    res.render('write', {
+
+    });
 
 });
 
-app.post('/board/write', function(req, res){
+app.post('/board/write', function (req, res) {
 
     let param = [req.body.title,
     req.body.content,
@@ -198,7 +221,7 @@ app.post('/board/write', function(req, res){
 
     let sql = "INSERT INTO board (title, content, writer) VALUES(?, ?, ?)";
 
-    conn.query(sql, param, function(err, result){
+    conn.query(sql, param, function (err, result) {
 
         if (!err) {
             res.redirect('/board');
@@ -208,6 +231,6 @@ app.post('/board/write', function(req, res){
 });
 
 let server = http.createServer(app);
-server.listen(app.get('port'), function(){
+server.listen(app.get('port'), function () {
     console.log(`Express 엔진이 ${app.get('port')}에서 실행중`);
 });

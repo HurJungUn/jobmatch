@@ -6,9 +6,9 @@
     <% include layout/nav %>
     <div class="container">
         <div class="row mt-4">
-            <form action="" method="POST">
+            <form action="/board/write" method="post">
                 제목 : <input type="text" name="title"><br>
-                글쓴이 : <input type="text" name="wirter"><br>
+                글쓴이 : <input type="text" name="writer"><br>
                 글내용 : <textarea name="content"></textarea>
                 <input class="btn btn-success" type="submit" value="전송">
             </form>
