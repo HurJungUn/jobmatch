@@ -1,11 +1,14 @@
 const request = require('request');
 const cheerio = require('cheerio');
+const iconv = require('iconv-lite');
+const charset = require('charset');
+
 const options = {
     url: "http://www.y-y.hs.kr/lunch.view?date=20190429",
     headers: {
-        'User-Agent': 'Mozilla/5.0',
-        'Content-Type': 'text/html; charset=utf-8'
-    }
+        'User-Agent': 'Mozilla/5.0'
+    },
+    encoding:null
 }
 
 request(options , function(err, res, body){
@@ -14,10 +17,13 @@ request(options , function(err, res, body){
         return;
     }
 
-    $ = cheerio.load(body);
-    let list = $(".menuName > span");
-    let txt = $(list[0]).text();
-    console.log(txt);
+    const enc = charset(res.headers, body);
+    console.log(enc);
+    const result = iconv.decode(body, enc);
+
+    $ = cheerio.load(result);
+    let menu = $(".menuName > span");
+    console.log(menu.text());
 });
 
 // request("http://www.y-y.hs.kr/lunch.view?date=20190429", function(err, res, body){
