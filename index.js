@@ -75,7 +75,7 @@ app.get('/ganyum', function (req, res) {
     });
 });
 app.post('/recom', function (req,res) {
-        let sql = "INSERT INTO count (id,title,writer,recommend) VALUES(?,?,?,?)";
+        let sql = "INSERT INTO sibal VALUES(?)";
         request("https://gall.dcinside.com/board/lists?id=comic_new1&exception_mode=recommend", function (err, response, body) {
             let list = [];
             $ = cheerio.load(body);
@@ -88,7 +88,7 @@ app.post('/recom', function (req,res) {
 
             for (let i = 0; i < list.length; i++) {
                 let com = list[i];
-                conn.query(sql, ["11","asdf","asdf","com"], function(err, result){
+                conn.query(sql, [com], function(err, result){
 
                 });
             }
