@@ -8,6 +8,14 @@
         <div class="row mt-4">
             <h1>데이터 차트</h1>
             <div class="col-10 offset-1">
+                    <form class="form-inline" action="/datalab" method="post">
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="word" class="sr-only">검색어</label>
+                                <input type="text" class="form-control" name="title" id="title" placeholder="title 입력">
+                                <input type="text" class="form-control" name="sub" id="sub" placeholder="sub 입력">
+                            </div>
+                            <button type="submit" class="btn btn-primary mb-2">검색하기</button>
+                        </form>
                 <canvas id="myChart" width="600" height="400">
 
                 </canvas>
