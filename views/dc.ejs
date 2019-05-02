@@ -4,9 +4,6 @@
 
 <body>
     <% include layout/nav %>
-    <form action="/recom" method="POST">
-        <input type="submit" value="save">
-    </form>
     <form class="form-inline" action="/ganyum" method="post">
         <div class="form-group mx-sm-3 mb-2">
             <label for="word" class="sr-only">검색어</label>
@@ -14,7 +11,9 @@
         </div>
         <button type="submit" class="btn btn-primary mb-2">검색하기</button>
     </form>
+
     <div class="container">
+            
         <div class="row mt-4">
             <div class="col-10 offset-1">
                 <h1><%= msg %></h1>
@@ -25,6 +24,9 @@
                 </ul>
             </div>
         </div>
+        <form class="form-inline" action="/recom" method="POST">
+            <input type="submit" class="form-control" value="to chart">
+        </form>
     </div>
 </body>
 

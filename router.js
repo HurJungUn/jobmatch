@@ -57,7 +57,12 @@ router.get('/ganyum', function (req, res) {
 });
 
 router.post('/recom', function (req, res) {
-    let sql = "INSERT INTO sibal VALUES(?)";
+    let insertsql = "INSERT INTO sibal VALUES(?,?)";
+    let deletesql = "DELETE FROM sibal";
+    let selectsql = "SELECT * FROM sibal ORDER BY id ASC";
+    conn.query(deletesql, [], function (err, result) {
+
+    });
     request("https://gall.dcinside.com/board/lists?id=comic_new1&exception_mode=recommend", function (err, response, body) {
         let list = [];
         $ = cheerio.load(body);
@@ -70,15 +75,44 @@ router.post('/recom', function (req, res) {
 
         for (let i = 0; i < list.length; i++) {
             let com = list[i];
-            conn.query(sql, [com], function (err, result) {
+            conn.query(insertsql, [i + 1, com], function (err, result) {
 
             });
         }
 
-        res.render('main', {
-            msg: 'Welcome To Express4'
+        conn.query(selectsql, [], function (err, result) {
+            let colors = ["rgb(255, 192, 192)", "rgb(75, 192, 255)", "rgb(75, 255, 128)"];
+            let gData = {
+                "labels": [
+
+                ], "datasets": [
+
+                ]
+            };
+
+            let date;
+
+            let item = {
+                "label": "DC만갤 념글 목록",
+                "borderColor": colors[1],
+                "fill": false,
+                "lineTension": 0.2,
+                "data": []
+            };
+            for (let i = 2; i <= 12; i++) {
+                item.data.push(result[i].recount);
+                gData.labels.push(result[i].id - 2);
+            }
+            gData.datasets.push(item);
+
+
+            res.render('datalab', {
+                g: gData
+            });
         });
     });
+
+
 });
 router.post('/ganyum', function (req, res) {
 
@@ -244,7 +278,6 @@ router.get('/datalab', function (req, res) {
                     let arr = date.split("-");
                     gData.labels.push(arr[1] + arr[2]);
                 }
-                
             }
 
             gData.datasets.push(item);
@@ -252,18 +285,20 @@ router.get('/datalab', function (req, res) {
         }
 
         res.render('datalab', {
-            g:gData
+            g: gData
         });
     });
 
 });
 
 router.post('/datalab', function (req, res) {
-    
+
+    let subs;
+
     if (req.body.sub.indexof(",") != null) {
-        let subs = req.body.sub.split(",");    
+        subs = req.body.sub.split(",");
     } else {
-        let subs = req.body.sub;
+        subs = [req.body.sub];
     }
 
     let data = [
@@ -303,7 +338,7 @@ router.post('/datalab', function (req, res) {
                     let arr = date.split("-");
                     gData.labels.push(arr[1] + arr[2]);
                 }
-                
+
             }
 
             gData.datasets.push(item);
@@ -311,7 +346,7 @@ router.post('/datalab', function (req, res) {
         }
 
         res.render('datalab', {
-            g:gData
+            g: gData
         });
     });
 });
